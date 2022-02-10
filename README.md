@@ -5,6 +5,8 @@ Pytorch implementation of MaskGIT: Masked Generative Image Transformer (https://
 
 MaskGIT is an extension to the VQGAN paper which improves the second stage transformer part (and leaves the first stage untouched). It switches the unidirectional transformer for a bidirectional transformer. The (second stage) training is pretty similar to BERT by randomly masking out tokens and trying to predict these using the bidirectional transformer (the original work used a GPT architecture randomly replaced tokens by other tokens). Different from BERT, the percentage for the masking is not fixed and uniformly distributed between 0 and 1 for each batch. Furhtermore, a new inference algorithm is suggested in which we start off by a completely masked-out image and then iteratively sample vectors where the model has a high confidence.
 
+If you are only interested in the part of the code that comes from this paper check out [transformer.py](https://github.com/dome272/MaskGIT-pytorch/blob/main/transformer.py).
+
 ### Run the code
 The code is ready for training both the VQGAN and the Bidirectional Transformer and can also be used for inference
 
