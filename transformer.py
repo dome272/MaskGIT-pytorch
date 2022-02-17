@@ -50,30 +50,33 @@ class VQGANTransformer(nn.Module):
         out[out < v[..., [-1]]] = 0
         return out
 
-    def gamma(self, mode="linear"):
+    def gamma_func(self, mode="cosine"):
         if mode == "linear":
             return lambda r: 1 - r
         elif mode == "cosine":
-            pass
+            return lambda r: np.cos(r * np.pi / 2)
         elif mode == "square":
-            pass
+            return lambda r: 1 - r**2
+        elif mode == "cubic":
+            return lambda r: 1 - r ** 3
         else:
             raise NotImplementedError
 
     @torch.no_grad()
-    def sample(self, condition=None, num=1, T=10, temperature=1.0):
+    def sample(self, condition=None, num=1, T=10, temperature=1.0, mode="cosine"):
         N = 256
         if condition is None:
             indices = torch.zeros((num, N), device="cuda", dtype=torch.int)
         else:
             indices = torch.hstack((condition, torch.zeros((condition.shape[0], N-condition.shape[1]), device="cuda", dtype=torch.int)))
-        gamma = lambda r: 1 - (r / T)
 
-        for t in range(1, T+1):
+        gamma = self.gamma(mode)
+
+        for t in range(T+1):
             # define a mask for the indices which have already been sampled
             unmasked = torch.clamp(indices, 0, 1).type(torch.int)
 
-            n = np.ceil(gamma(t) * N)
+            n = np.ceil(gamma(t/T) * N)
             logits = self.transformer(indices)
 
             logits = logits / temperature
@@ -111,18 +114,18 @@ class VQGANTransformer(nn.Module):
         return indices
 
     @torch.no_grad()
-    def log_images(self, x):
+    def log_images(self, x, mode="cosine"):
         log = dict()
 
         _, z_indices = self.encode_to_z(x)
 
         # create a "half" sample
         z_start_indices = z_indices[:, :z_indices.shape[1]//2]
-        half_index_sample = self.sample(condition=z_start_indices)
+        half_index_sample = self.sample(condition=z_start_indices, mode=mode)
         x_sample = self.indices_to_image(half_index_sample)
 
         # create new sample
-        index_sample = self.sample()
+        index_sample = self.sample(mode=mode)
         x_new = self.indices_to_image(index_sample)
 
         # create reconstruction
