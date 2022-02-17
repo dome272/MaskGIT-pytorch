@@ -7,7 +7,7 @@ MaskGIT is an extension to the VQGAN paper which improves the second stage trans
 
 If you are only interested in the part of the code that comes from this paper check out [transformer.py](https://github.com/dome272/MaskGIT-pytorch/blob/main/transformer.py).
 
-### Run the code
+## Run the code
 The code is ready for training both the VQGAN and the Bidirectional Transformer and can also be used for inference
 
 ```python training_vqgan.py```
@@ -16,9 +16,9 @@ The code is ready for training both the VQGAN and the Bidirectional Transformer 
 
 (Make sure to edit the path for the dataset etc.)
 
-### TODO
-- Implement the gamma functions
-- Implement functions for image editing tasks: inpainting, extrapolation, image manipulation
-- Tune hyperparameters
-- (Provide visual results)
+## TODO
+- [x] Implement the gamma functions
+- [ ] Implement functions for image editing tasks: inpainting, extrapolation, image manipulation
+- [ ] Tune hyperparameters
+- [ ] (Provide visual results)
 
