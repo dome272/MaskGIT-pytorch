@@ -1,5 +1,8 @@
 # MaskGIT-pytorch
 Pytorch implementation of MaskGIT: Masked Generative Image Transformer (https://arxiv.org/pdf/2202.04200.pdf)
+<p align="center">
+<img width="718" alt="results" src="https://user-images.githubusercontent.com/61938694/154553460-3eb2b55e-e313-4100-bc5e-b9d8c4dd8cd7.png">
+</p>
 
 #### Note: this is work in progress
 
