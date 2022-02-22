@@ -22,6 +22,7 @@ The code is ready for training both the VQGAN and the Bidirectional Transformer 
 ## TODO
 - [x] Implement the gamma functions
 - [ ] Implement functions for image editing tasks: inpainting, extrapolation, image manipulation
+  - started working on inpainting function. [transformer.py](https://github.com/dome272/MaskGIT-pytorch/blob/main/transformer.py#L152)
 - [ ] Tune hyperparameters
 - [ ] (Provide visual results)
 
