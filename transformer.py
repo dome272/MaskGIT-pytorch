@@ -157,6 +157,7 @@ class VQGANTransformer(nn.Module):
         # encode masked image
         # _, indices = self.encode_to_z(masked_image)
         indices = torch.randint(1024, (1, 256))
+        mask = mask[:, 0, :, :]
 
         # set masked patches to be 0 -> so that the sampling part only samples indices for these patches
         # 1. idea: just calculate the ratio between 256x256 image and 16x16 latent image and set the area
@@ -164,7 +165,7 @@ class VQGANTransformer(nn.Module):
         # 2. idea: check if patches which were masked in the original image are always the same in the latent space
         #          If so: set these to 0
         p = 16
-        patched_mask = mask[:, 0, :, :].unfold(2, p, p).unfold(1, p, p)
+        patched_mask = mask.unfold(2, p, p).unfold(1, p, p)
         patched_mask = torch.transpose(patched_mask, 3, 4)
         patched_mask = patched_mask.permute(1, 2, 0, 3, 4)
         patched_mask = patched_mask.contiguous().view(patched_mask.size(0) * patched_mask.size(1), -1)  # 256 x 256 i.e. 16x16 x 256
@@ -178,7 +179,21 @@ class VQGANTransformer(nn.Module):
         # reconstruct inpainted image
         inpainted_image = self.indices_to_image(sampled_indices)
 
-        # TODO linearly blend the input image and inpainted image at border of mask (to avoid sharp edges at border of mask)
+        # linearly blend the input image and inpainted image at border of mask (to avoid sharp edges at border of mask)
+        indices_mask = indices_mask.reshape(1, 1, 16, 16)
+        upsampled_indices_mask = F.interpolate(indices_mask, scale_factor=16).squeeze(0)
+        intra = torch.where(mask != upsampled_indices_mask, 1, 0)
+
+        # define mask for blending
+        n = 128
+        base = torch.arange(n).view(1,-1).max(torch.arange(n).view(-1,1))
+        right = torch.stack((torch.rot90(base, 1, [0,1]), base)).reshape(n*2, n)
+        left = torch.stack((torch.rot90(base, 2, [0,1]), torch.rot90(base, 3, [0,1]))).reshape(n*2, n)
+        full = torch.cat((left, right), 1)
+
+        # construct opacity matrix for intra region
+        mask_blend = torch.where(intra == 1, full, 0)
+        #TODO scale values to be between 0 and 1
 
         return inpainted_image
 
