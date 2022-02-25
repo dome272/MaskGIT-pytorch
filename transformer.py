@@ -145,18 +145,17 @@ class VQGANTransformer(nn.Module):
 
     @staticmethod
     def create_masked_image(image: torch.Tensor, x_start: int = 100, y_start: int = 100, size: int = 50):
-        mask = torch.ones_like(image)
+        mask = torch.ones_like(image, dtype=torch.int)
         mask[:, :, x_start:x_start+size, y_start:y_start+size] = 0
         return image * mask, mask
 
     def inpainting(self, image: torch.Tensor, x_start: int = 100, y_start: int = 100, size: int = 50):
-        """NOTE: this function does not fully work yet. Im working on it."""
         # apply mask on image
         masked_image, mask = self.create_masked_image(image, x_start, y_start, size)
 
         # encode masked image
         # _, indices = self.encode_to_z(masked_image)
-        indices = torch.randint(1024, (1, 256))
+        indices = torch.randint(1024, (1, 256), dtype=torch.int)
         mask = mask[:, 0, :, :]
 
         # set masked patches to be 0 -> so that the sampling part only samples indices for these patches
@@ -180,7 +179,7 @@ class VQGANTransformer(nn.Module):
         inpainted_image = self.indices_to_image(sampled_indices)
 
         # linearly blend the input image and inpainted image at border of mask (to avoid sharp edges at border of mask)
-        indices_mask = indices_mask.reshape(1, 1, 16, 16)
+        indices_mask = indices_mask.reshape(1, 1, 16, 16).type(torch.float)
         upsampled_indices_mask = F.interpolate(indices_mask, scale_factor=16).squeeze(0)
         intra = torch.where(mask != upsampled_indices_mask, 1, 0)
 
@@ -192,10 +191,16 @@ class VQGANTransformer(nn.Module):
         full = torch.cat((left, right), 1)
 
         # construct opacity matrix for intra region
-        mask_blend = torch.where(intra == 1, full, 0)
-        #TODO scale values to be between 0 and 1
+        min_blend = torch.min(torch.where(intra == 1, full, 1000000))
+        max_blend = torch.max(torch.where(intra == 1, full, -1000000))
+        mask_blend = torch.where(intra == 1, (full-min_blend)/max_blend, torch.ones_like(intra, dtype=torch.float))
 
-        return inpainted_image
+        mask_real = torch.where(mask == 0, mask.type(torch.float), mask_blend)
+        mask_fake = torch.where(mask == 0, (1-mask).type(torch.float), mask_blend)
+        
+        blended_image = mask_real * image + mask_fake * inpainted_image
+
+        return blended_image, inpainted_image
 
 
 
