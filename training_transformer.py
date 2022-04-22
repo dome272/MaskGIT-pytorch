@@ -120,7 +120,7 @@ if __name__ == '__main__':
     parser.add_argument('--num-image-tokens', type=int, default=256, help='Number of image tokens.')
 
     args = parser.parse_args()
-    args.run_name = "172M_1000epochs_32x32"
+    args.run_name = "<name>"
     args.dataset_path = r"C:\Users\dome\datasets\landscape"
     args.checkpoint_path = r".\checkpoints"
     args.n_layers = 24
@@ -133,12 +133,8 @@ if __name__ == '__main__':
     args.start_from_epoch = 0
 
     args.num_codebook_vectors = 1024
-    # args.num_codebook_vectors = 8192
     args.num_image_tokens = 256
 
 
     train_transformer = TrainTransformer(args)
-    # t = VQGANTransformer(args)
-    # t.load_checkpoint(20)
-    # all_zeroes = torch.zeros((1, 1024), dtype=torch.int).to("cuda")
-    # i = t.indices_to_image(all_zeroes)
+    
