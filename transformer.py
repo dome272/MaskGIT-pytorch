@@ -12,8 +12,8 @@ class VQGANTransformer(nn.Module):
     def __init__(self, args):
         super().__init__()
         self.num_image_tokens = args.num_image_tokens
-        self.sos_token = args.num_image_tokens + 1
-        self.mask_token_id = args.num_image_tokens  # 1024
+        self.sos_token = args.num_codebook_vectors + 1
+        self.mask_token_id = args.num_codebook_vectors
         self.choice_temperature = 4.5
 
         self.gamma = self.gamma_func("cosine")
