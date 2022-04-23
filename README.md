@@ -11,6 +11,17 @@ MaskGIT is an extension to the VQGAN paper which improves the second stage trans
 
 If you are only interested in the part of the code that comes from this paper check out [transformer.py](https://github.com/dome272/MaskGIT-pytorch/blob/main/transformer.py).
 
+## Results
+(Training on https://www.kaggle.com/arnaud58/landscape-pictures, epochs=1000, bs=100)
+<p>
+  <img src="https://user-images.githubusercontent.com/61938694/163984267-4e22fd7b-512b-43b3-8fcf-002595e066e7.png" width="200"/>
+  <img src="https://user-images.githubusercontent.com/61938694/163984994-95c44898-3734-4438-8c6b-6c1c1cc86920.png" width="200"/>
+  <img src="https://user-images.githubusercontent.com/61938694/163985169-07cd7fb8-5517-41e3-83b2-7f2c99e3da8d.png" width="200"/>
+  <img src="https://user-images.githubusercontent.com/61938694/163985493-0beb72bb-7e8a-4c9d-91f7-301e25ef42e6.png" width="200"/>
+</p>
+Note: The training only encompasses about 3% of data of what the original paper trained on. (8.000 * 1.000 / 1.000.000 * 300 = 0.026)
+So longer training probably results in better outcomes. See also Issue https://github.com/dome272/MaskGIT-pytorch/issues/6
+
 ## Run the code
 The code is ready for training both the VQGAN and the Bidirectional Transformer and can also be used for inference
 
@@ -25,6 +36,6 @@ The code is ready for training both the VQGAN and the Bidirectional Transformer 
 - [ ] Implement functions for image editing tasks: inpainting, extrapolation, image manipulation
   - started working on inpainting function. [transformer.py](https://github.com/dome272/MaskGIT-pytorch/blob/main/transformer.py#L152)
 - [ ] Tune hyperparameters
-- [ ] (Provide visual results)
+- [x] Provide visual results
 - [ ] Pre-Norm instead of Post-Norm
 
