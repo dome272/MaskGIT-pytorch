@@ -76,7 +76,7 @@ class VQGANTransformer(nn.Module):
 
         logits = self.transformer(a_indices)
 
-        return logits, target
+        return logits[mask], target[mask]
 
     def top_k_logits(self, logits, k):
         v, ix = torch.topk(logits, k)
