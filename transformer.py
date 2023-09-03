@@ -68,7 +68,7 @@ class VQGANTransformer(nn.Module):
         # mask = mask.round().to(dtype=torch.int64)
         # masked_indices = torch.zeros_like(z_indices)
         masked_indices = self.mask_token_id * torch.ones_like(z_indices, device=z_indices.device)
-        a_indices = mask * z_indices + (~mask) * masked_indices
+        a_indices = ~mask * z_indices + (mask) * masked_indices
 
         a_indices = torch.cat((sos_tokens, a_indices), dim=1)
 
